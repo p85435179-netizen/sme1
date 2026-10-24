@@ -21,6 +21,7 @@ let role = '';
 let page = 'Overview';
 let transactions = [];
 let users = [];
+let systemAdmins = [];
 let invoices = [];
 let payments = [];
 let dashboardMonth = today().slice(0, 7);
@@ -75,6 +76,7 @@ async function loadState() {
     version: Number(record.version),
   }));
   users = state.users;
+  systemAdmins = state.super_admins || [];
   invoices = state.invoices.map((invoice) => ({
     ...invoice,
     id: Number(invoice.id),

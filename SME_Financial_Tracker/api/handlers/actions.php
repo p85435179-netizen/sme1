@@ -41,8 +41,31 @@ if ($action === 'registration_review') {
     $database->commit();
     respondJson(['ok' => true]);
 }
+if ($action === 'admin_user_create') {
+    requireRole('Super Admin');
+    $name = validateText($input['name'] ?? null);
+    $username = validateUsername($input['username'] ?? null);
+    $password = password_hash(validatePassword($input['password'] ?? null), PASSWORD_DEFAULT);
+    $newRole = validateChoice($input['role'] ?? null, ['Super Admin', 'Business Owner', 'Finance Staff', 'Manager']);
+    $database->beginTransaction();
+    $newWorkspaceId = null;
+    if ($newRole === 'Business Owner') {
+        queryDatabase('INSERT INTO workspaces (name) VALUES (?)', [validateText($input['workspace'] ?? null)]);
+        $newWorkspaceId = (int) $database->lastInsertId();
+    } elseif (in_array($newRole, ['Finance Staff', 'Manager'], true)) {
+        $newWorkspaceId = validateId($input['workspace_id'] ?? null);
+        if (!queryDatabase("SELECT id FROM users WHERE workspace_id=? AND role='Business Owner' AND active=1 AND approval_status='Approved'", [$newWorkspaceId])->fetchColumn()) {
+            respondError('Select a business with an approved, active owner.');
+        }
+    }
+    queryDatabase("INSERT INTO users (name,username,password,role,workspace_id,active,approval_status,approved_by,approved_at) VALUES (?,?,?,?,?,1,'Approved',?,CURRENT_TIMESTAMP)", [$name, $username, $password, $newRole, $newWorkspaceId, $userId]);
+    $id = (int) $database->lastInsertId();
+    audit('User created', $username . ' (' . $newRole . ')', $newWorkspaceId);
+    $database->commit();
+    respondJson(['ok' => true, 'id' => $id]);
+}
 if ($user['role'] === 'Super Admin') {
-    respondError('Super Admin can review business registrations and manage their own password.', 403);
+    respondError('This action is not available to Super Admin.', 403);
 }
 if (in_array($action, ['transaction_create', 'transaction_update'], true)) {
     requireRole('Business Owner', 'Finance Staff');

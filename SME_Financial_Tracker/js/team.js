@@ -100,8 +100,9 @@ function reviewRegistration(id, status) {
     status === 'Approved' ? 'Approve' : 'Reject');
 }
 function ownerDirectoryPage() {
-  return heading('User Management', 'Select a business owner to view their Finance Staff and Managers.') +
-    `<section class="card panel"><div class="filters"><input aria-label="Search business owners" placeholder="Search owner, username or business" value="${esc(userQuery)}" oninput="userQuery=this.value;updateOwnerDirectory()"></div><div id="owner-directory">${ownerDirectoryRows()}</div></section>`;
+  return heading('User Management', 'Create accounts for any role, or select an owner to view their business team.', '<button class="primary" onclick="createAdminUser()">＋ Add user</button>') +
+    `<section class="card panel"><div class="filters"><input aria-label="Search business owners" placeholder="Search owner, username or business" value="${esc(userQuery)}" oninput="userQuery=this.value;updateOwnerDirectory()"></div><div id="owner-directory">${ownerDirectoryRows()}</div></section>` +
+    `<section class="card panel"><h2>Super Admins</h2><div class="tablewrap"><table><thead><tr><th>NAME</th><th>USERNAME</th><th>STATUS</th></tr></thead><tbody>${systemAdmins.map((account) => `<tr><td>${esc(account.name)}</td><td>${esc(account.username)}</td><td>${esc(account.approval_status)}</td></tr>`).join('')}</tbody></table></div></section>`;
 }
 function ownerDirectoryRows() {
   const records = users.filter((account) => `${account.name} ${account.username} ${account.business}`.toLowerCase().includes(userQuery.toLowerCase()));
@@ -120,4 +121,29 @@ async function viewBusinessTeam(id) {
 }
 function businessTeamDetails({ owner, team }) {
   return `<p><strong>${esc(owner.business)}</strong></p><p>Owner: ${esc(owner.name)} · ${esc(owner.username)}</p><p>${team.filter((account) => account.role === 'Finance Staff').length} Finance Staff · ${team.filter((account) => account.role === 'Manager').length} Managers</p><div class="tablewrap"><table><thead><tr><th>NAME</th><th>ROLE</th><th>STATUS</th></tr></thead><tbody>${team.map((account) => `<tr><td><strong>${esc(account.name)}</strong><small>${esc(account.username)}</small></td><td>${esc(account.role)}</td><td>${esc(account.approval_status)}</td></tr>`).join('')}</tbody></table></div>${team.length ? '' : '<div class="empty">This business has no Finance Staff or Managers yet.</div>'}`;
+}
+function createAdminUser() {
+  const businesses = [...new Map(users.filter((account) => account.approval_status === 'Approved' && Number(account.active) === 1).map((account) => [Number(account.workspace_id), account.business])).entries()];
+  openModal('Create user',
+    input('Full name', 'name') + input('Username', 'username') +
+    selectField('Role', 'role', ['Business Owner', 'Finance Staff', 'Manager', 'Super Admin'].map((value) => [value, value]), 'Business Owner') +
+    `<div id="new-owner-business">${input('Business name', 'workspace')}</div>` +
+    `<div id="new-team-business" hidden>${selectField('Business', 'workspace_id', [['', 'Select a business'], ...businesses], '')}<p class="section-note">Select the business this staff member or manager belongs to.</p></div>` +
+    input('Initial password', 'password', 'password') +
+    '<p class="section-note">Accounts created by Super Admin are approved immediately.</p>',
+    async (data) => saveAndRefresh('admin_user_create', Object.fromEntries(data), 'User created'),
+    'Create user');
+  $('#field-role').addEventListener('change', updateAdminUserRole);
+  updateAdminUserRole();
+}
+function updateAdminUserRole() {
+  const selected = $('#field-role').value;
+  const owner = selected === 'Business Owner';
+  const team = ['Finance Staff', 'Manager'].includes(selected);
+  $('#new-owner-business').hidden = !owner;
+  $('#field-workspace').disabled = !owner;
+  $('#field-workspace').required = owner;
+  $('#new-team-business').hidden = !team;
+  $('#field-workspace_id').disabled = !team;
+  $('#field-workspace_id').required = team;
 }

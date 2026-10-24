@@ -89,3 +89,5 @@ Verification tools and rollback snapshots are kept outside the deployed system f
 
 
 Super Admin User Management lists business owners. Select an owner name or View staff & managers to inspect the Finance Staff and Managers in that owner's business. Team membership is grouped by business, including when a business has more than one owner. This directory does not expose passwords or financial records.
+
+Super Admin can create Super Admin, Business Owner, Finance Staff and Manager accounts in Users > Add user. These accounts are approved immediately. A new owner gets a separate business; team accounts require a business with an active approved owner. Business Owners remain restricted to creating Finance Staff and Managers.

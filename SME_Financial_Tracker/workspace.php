@@ -32,8 +32,8 @@ header('Content-Type: text/html; charset=utf-8');
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Workspace | SME Financial Tracker</title>
-    <link rel="stylesheet" href="style.css?v=finance-5">
-    <script src="js/auth.js?v=finance-5"></script>
+    <link rel="stylesheet" href="style.css?v=finance-6">
+    <script src="js/auth.js?v=finance-6"></script>
   </head>
   <body data-protected="true">
     <button class="sidebar-backdrop" aria-label="Close navigation" onclick="toggleSidebar(false)"></button>
@@ -62,18 +62,19 @@ header('Content-Type: text/html; charset=utf-8');
       <form id="form"><div class="modalhead"><h2 id="modalTitle"></h2><button type="button" onclick="closeModal()" aria-label="Close">×</button></div><div id="fields"></div><p id="form-error" role="alert"></p><div class="modalactions"><button type="button" onclick="closeModal()">Cancel</button><button class="primary" type="submit">Save</button></div></form>
     </dialog>
     <div id="toast" role="status"></div>
-    <script src="js/state.js?v=finance-5"></script>
-    <script src="js/ui.js?v=finance-5"></script>
-    <script src="js/sidebar.js?v=finance-5"></script>
-    <script src="js/transactions.js?v=finance-5"></script>
-    <script src="js/overview.js?v=finance-5"></script>
-    <script src="js/reports.js?v=finance-5"></script>
-    <script src="js/invoices.js?v=finance-5"></script>
-    <script src="js/team.js?v=finance-5"></script>
-    <script src="js/settings.js?v=finance-5"></script>
-    <script src="js/router.js?v=finance-5"></script>
-    <script src="app.js?v=finance-5"></script>
+    <script src="js/state.js?v=finance-6"></script>
+    <script src="js/ui.js?v=finance-6"></script>
+    <script src="js/sidebar.js?v=finance-6"></script>
+    <script src="js/transactions.js?v=finance-6"></script>
+    <script src="js/overview.js?v=finance-6"></script>
+    <script src="js/reports.js?v=finance-6"></script>
+    <script src="js/invoices.js?v=finance-6"></script>
+    <script src="js/team.js?v=finance-6"></script>
+    <script src="js/settings.js?v=finance-6"></script>
+    <script src="js/router.js?v=finance-6"></script>
+    <script src="app.js?v=finance-6"></script>
   </body>
 </html>
+
 
 

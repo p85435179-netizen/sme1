@@ -22,6 +22,7 @@ if ($user['role'] === 'Super Admin') {
     respondJson([
         'user' => $user,
         'transactions' => [],
+        'super_admins' => queryDatabase("SELECT id,name,username,active,approval_status FROM users WHERE role='Super Admin' AND approval_status<>'Deleted' ORDER BY name,id")->fetchAll(),
         'users' => queryDatabase("SELECT u.id,u.name,u.username,u.role,u.active,u.approval_status,u.workspace_id,u.created_at,w.name AS business FROM users u LEFT JOIN workspaces w ON w.id=u.workspace_id WHERE u.role='Business Owner' AND u.approval_status<>'Deleted' ORDER BY u.id DESC")->fetchAll(),
         'invoices' => [],
         'payments' => [],
