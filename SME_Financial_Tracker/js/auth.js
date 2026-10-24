@@ -58,12 +58,12 @@ const roleModules = {
 };
 function moduleUrl(userRole, module) {
   const directory = roleDirectories[userRole];
-  if (!directory) return new URL('../login.html', apiBase).href;
+  if (!directory) return new URL('../login.php', apiBase).href;
   if (!roleModules[userRole].includes(module)) module = roleModules[userRole][0];
-  return new URL('../' + directory + '/' + moduleFiles[module] + '.html', apiBase).href;
+  return new URL('../' + directory + '/' + moduleFiles[module] + '.php', apiBase).href;
 }
 function workspaceHomeUrl(account = sessionInfo?.user) {
-  if (!account) return new URL('../login.html', apiBase).href;
+  if (!account) return new URL('../login.php', apiBase).href;
   return moduleUrl(account.role, account.role === 'Super Admin' ? 'Registrations' : 'Overview');
 }
 async function openWorkspace() {
@@ -110,7 +110,7 @@ async function api(action, data, query = {}) {
   }
   if (!response.ok) {
     if (response.status === 401 && document.body?.dataset.protected) {
-      location.replace(new URL('../login.html', apiBase).href);
+      location.replace(new URL('../login.php', apiBase).href);
     }
     throw new Error(result.error || 'Request failed.');
   }
@@ -129,7 +129,7 @@ function logout() {
     '<p>Are you sure you want to log out?</p>',
     async () => {
       await api('logout', {});
-      location.replace(new URL('../login.html', apiBase).href);
+      location.replace(new URL('../login.php', apiBase).href);
     },
     'Log out',
   );
@@ -141,7 +141,7 @@ window.addEventListener('pageshow', async (event) => {
     sessionInfo = await api('session');
     if (document.body?.dataset.protected) {
       if (!sessionInfo.user) {
-        location.replace(new URL('../login.html', apiBase).href);
+        location.replace(new URL('../login.php', apiBase).href);
         return;
       }
       if (document.body.dataset.role !== sessionInfo.user.role) {
@@ -150,7 +150,7 @@ window.addEventListener('pageshow', async (event) => {
       }
       await loadState();
       render();
-    } else if (sessionInfo.user && !location.pathname.endsWith('admin_setup.html')) {
+    } else if (sessionInfo.user && !location.pathname.endsWith('admin_setup.php')) {
       openWorkspace();
     }
   } catch {

@@ -1,0 +1,123 @@
+<?php
+$pageRole = 'Manager';
+require __DIR__ . '/../api/page.php';
+?>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Reports | SME Financial Tracker</title>
+    <link rel="stylesheet" href="../style.css?v=finance-8" />
+    <script src="../js/auth.js?v=finance-8"></script>
+  </head>
+  <body data-protected="true" data-role="Manager" data-page="Reports">
+    <button
+      class="sidebar-backdrop"
+      aria-label="Close navigation"
+      onclick="toggleSidebar(false)"
+    ></button>
+    <aside id="sidebar" aria-label="Main navigation">
+      <div class="sidebar-scroll">
+        <a
+          class="brand"
+          href="dashboard.php"
+          onclick="
+            go('Overview');
+            return false;
+          "
+        >
+          <span class="logo" aria-hidden="true">
+            <svg viewBox="0 0 46 46" fill="none">
+              <path
+                d="M12 29L20 21L25 25L34 15M26 15H34V23"
+                stroke="white"
+                stroke-width="3.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </span>
+          <span>
+            ledgerly
+            <small>SME FINANCIALS</small>
+          </span>
+        </a>
+        <div class="workspace">
+          <b class="avatar" id="business-initial">B</b>
+          <span>
+            <strong id="business-name">Loading workspace</strong>
+            <small id="workspace-description">Financial tracker</small>
+          </span>
+        </div>
+        <label>WORKSPACE</label>
+        <nav id="nav"></nav>
+        <div class="help">
+          <h4>A clearer view of your finances</h4>
+          <p>Record income and expenses, track cash, and export financial reports.</p>
+          <button onclick="showHelp()">Workspace guide ↗</button>
+        </div>
+      </div>
+      <div class="profile">
+        <b class="avatar" id="initials">…</b>
+        <span>
+          <strong id="person">Loading</strong>
+          <small id="job"></small>
+        </span>
+        <button class="logout-button" onclick="logout()">Log out</button>
+      </div>
+    </aside>
+    <div class="shell">
+      <header>
+        <button
+          class="menu-toggle"
+          aria-label="Open navigation"
+          aria-controls="sidebar"
+          aria-expanded="false"
+          onclick="toggleSidebar()"
+        >
+          ☰
+        </button>
+        <div>
+          Workspace
+          <span>/</span>
+          <strong id="crumb">Overview</strong>
+        </div>
+        <div class="topright">
+          <button onclick="refreshWorkspace()" aria-label="Refresh workspace">↻ Refresh</button>
+          <button onclick="showNotifications()" aria-label="Notifications">◷</button>
+          <span class="pill" id="role-label"></span>
+        </div>
+      </header>
+      <main id="main" aria-busy="true">
+        <section class="card panel"><h1>Loading your workspace…</h1></section>
+      </main>
+    </div>
+    <dialog id="modal" aria-labelledby="modalTitle">
+      <form id="form">
+        <div class="modalhead">
+          <h2 id="modalTitle"></h2>
+          <button type="button" onclick="closeModal()" aria-label="Close">×</button>
+        </div>
+        <div id="fields"></div>
+        <p id="form-error" role="alert"></p>
+        <div class="modalactions">
+          <button type="button" onclick="closeModal()">Cancel</button>
+          <button class="primary" type="submit">Save</button>
+        </div>
+      </form>
+    </dialog>
+    <div id="toast" role="status"></div>
+    <script src="../js/state.js?v=finance-8"></script>
+    <script src="../js/ui.js?v=finance-8"></script>
+    <script src="../js/sidebar.js?v=finance-8"></script>
+    <script src="../js/transactions.js?v=finance-8"></script>
+    <script src="../js/overview.js?v=finance-8"></script>
+    <script src="../js/reports.js?v=finance-8"></script>
+    <script src="../js/invoices.js?v=finance-8"></script>
+    <script src="../js/team.js?v=finance-8"></script>
+    <script src="../js/settings.js?v=finance-8"></script>
+    <script src="../js/router.js?v=finance-8"></script>
+    <script src="../app.js?v=finance-8"></script>
+  </body>
+</html>

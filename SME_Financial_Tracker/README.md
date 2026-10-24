@@ -73,7 +73,7 @@ Then open `http://127.0.0.1:8080/`. Always use the router to protect private dir
 
 A pre-upgrade source and database snapshot was saved outside the system folder. The migration preserves existing IDs, credentials and monetary records. Previous supplier-related tables remain in old databases but are outside the active system modules. Old role-specific links redirect to the authenticated workspace.
 
-Frontend pages are static HTML, with JavaScript session and role checks before rendering. Every API request independently enforces authentication and role/business permissions. Static HTML contains no private account or financial data. Writes require CSRF tokens, validated inputs and role/business permissions. Edits and payment updates use record versions to detect stale updates. Password resets and access changes revoke older sessions. SQL queries use bound parameters; history views join creators, invoices and payments. Use HTTPS on a hosted server and do not publish saved databases or real database passwords on GitHub.
+Frontend pages use PHP with server-side session and role checks, plus JavaScript checks before rendering. Every API request independently enforces authentication and role/business permissions. Page access and all financial API operations require an approved account. Writes require CSRF tokens, validated inputs and role/business permissions. Edits and payment updates use record versions to detect stale updates. Password resets and access changes revoke older sessions. SQL queries use bound parameters; history views join creators, invoices and payments. Use HTTPS on a hosted server and do not publish saved databases or real database passwords on GitHub.
 
 ## Source folders
 
@@ -82,11 +82,11 @@ Frontend pages are static HTML, with JavaScript session and role checks before r
 - `database/`: complete SQLite and MySQL schemas.
 - `data/`: the saved local database.
 - `js/`: authentication, dashboards, income/expense history, invoices, reports, users and settings.
-- `superadmin/`: registration approvals, user management and own account HTML pages.
-- `business_owner/`: separate HTML files for dashboard, income, expenses, transactions, invoices, reports, financial summary, user management, activity and settings.
-- `finance_staff/`: separate HTML files for the allowed recording and reporting modules.
-- `manager/`: separate HTML files for read-only financial modules and own account.
-- `workspace.html`: routes existing workspace links to the signed-in role.
+- `superadmin/`: registration approvals, user management and own account PHP pages.
+- `business_owner/`: separate PHP files for dashboard, income, expenses, transactions, invoices, reports, financial summary, user management, activity and settings.
+- `finance_staff/`: separate PHP files for the allowed recording and reporting modules.
+- `manager/`: separate PHP files for read-only financial modules and own account.
+- `workspace.php`: routes existing workspace links to the signed-in role.
 
 Verification tools and rollback snapshots are kept outside the deployed system folder.
 
@@ -96,4 +96,4 @@ Super Admin User Management lists business owners. Select an owner name or View 
 
 Super Admin can create Super Admin, Business Owner, Finance Staff and Manager accounts in Users > Add user. These accounts are approved immediately. A new owner gets a separate business; team accounts require a business with an active approved owner. Business Owners remain restricted to creating Finance Staff and Managers.
 
-Dashboard: six cards show monthly income, expenses, net profit, recorded transaction count, highest expense group, and current cash. The pie groups Payroll into Salary, Electricity/Internet into Utilities, and remaining non-core categories into Others. Reports support Daily, Weekly, Monthly, Yearly, all dates and custom dates, with totals and transaction summary. Print / Save PDF uses the browser print dialog; Download CSV exports the selected report. Shared JS modules and CSS keep behavior consistent across role HTML pages. PHP files serve backend operations only.
+Dashboard: six cards show monthly income, expenses, net profit, recorded transaction count, highest expense group, and current cash. The pie groups Payroll into Salary, Electricity/Internet into Utilities, and remaining non-core categories into Others. Reports support Daily, Weekly, Monthly, Yearly, all dates and custom dates, with totals and transaction summary. Print / Save PDF uses the browser print dialog; Download CSV exports the selected report. Shared JS modules and CSS keep behavior consistent across role PHP pages. PHP files serve backend operations only.

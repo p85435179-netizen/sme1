@@ -4,10 +4,12 @@ if (preg_match('~(?:^|/)(?:data|database|config|exports|tests|\.[^/]*)(?:/|$)~i'
     http_response_code(403);
     exit('Forbidden');
 }
-if (basename($path) === 'workspace.php' || preg_match('~/(store_owner|staff|supplier)/[^/]+\.html$~', $path)) {
-    $target = preg_replace('~/(store_owner|staff|supplier)/[^/]+\.html$~', '/workspace.html', $path);
-    $target = preg_replace('~/workspace\.php$~', '/workspace.html', $target);
-    header('Location: ' . $target, true, 302);
+if (preg_match('~/(store_owner|staff|supplier)/[^/]+\.(?:html|php)$~', $path)) {
+    header('Location: ' . preg_replace('~/(store_owner|staff|supplier)/[^/]+\.(?:html|php)$~', '/workspace.php', $path), true, 302);
+    exit();
+}
+if (str_ends_with($path, '.html')) {
+    header('Location: ' . substr($path, 0, -5) . '.php', true, 302);
     exit();
 }
 return false;

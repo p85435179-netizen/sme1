@@ -43,7 +43,7 @@ CREATE TABLE `activity_logs` (
   KEY `workspace_id` (`workspace_id`),
   CONSTRAINT `activity_logs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
   CONSTRAINT `activity_logs_ibfk_2` FOREIGN KEY (`workspace_id`) REFERENCES `workspaces` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -52,7 +52,7 @@ CREATE TABLE `activity_logs` (
 
 LOCK TABLES `activity_logs` WRITE;
 /*!40000 ALTER TABLE `activity_logs` DISABLE KEYS */;
-INSERT INTO `activity_logs` VALUES (1,2,1,'System Administrator','Login','Signed in','2026-10-24 03:23:11'),(2,2,1,'System Administrator','Login','Signed in','2026-10-24 03:25:21'),(3,2,1,'System Administrator','Login','Signed in','2026-10-24 03:28:56'),(4,NULL,2,'Registration','Registration submitted','cjjj registered as Business Owner','2026-10-24 03:30:30'),(5,3,2,'cjjj','Login','Signed in','2026-10-24 03:30:47'),(6,4,NULL,'Super Administrator','Login','Signed in','2026-10-24 03:39:48'),(7,4,NULL,'Super Administrator','Login','Signed in','2026-10-24 03:42:16'),(8,4,NULL,'Super Administrator','Login','Signed in','2026-10-24 03:44:02'),(9,2,1,'System Administrator','Login','Signed in','2026-10-24 03:44:03'),(10,4,NULL,'Super Administrator','Login','Signed in','2026-10-24 03:52:37'),(11,4,NULL,'Super Administrator','Login','Signed in','2026-10-24 03:52:47'),(12,3,2,'cjjj','Login','Signed in','2026-10-24 04:09:02'),(13,3,2,'cjjj','Transaction created','Record #2: item','2026-10-24 04:12:18'),(14,4,NULL,'Super Administrator','Login','Signed in','2026-10-24 04:35:02'),(15,2,1,'System Administrator','Login','Signed in','2026-10-24 04:35:02');
+INSERT INTO `activity_logs` VALUES (1,2,1,'System Administrator','Login','Signed in','2026-10-24 03:23:11'),(2,2,1,'System Administrator','Login','Signed in','2026-10-24 03:25:21'),(3,2,1,'System Administrator','Login','Signed in','2026-10-24 03:28:56'),(4,NULL,2,'Registration','Registration submitted','cjjj registered as Business Owner','2026-10-24 03:30:30'),(5,3,2,'cjjj','Login','Signed in','2026-10-24 03:30:47'),(6,4,NULL,'Super Administrator','Login','Signed in','2026-10-24 03:39:48'),(7,4,NULL,'Super Administrator','Login','Signed in','2026-10-24 03:42:16'),(8,4,NULL,'Super Administrator','Login','Signed in','2026-10-24 03:44:02'),(9,2,1,'System Administrator','Login','Signed in','2026-10-24 03:44:03'),(10,4,NULL,'Super Administrator','Login','Signed in','2026-10-24 03:52:37'),(11,4,NULL,'Super Administrator','Login','Signed in','2026-10-24 03:52:47'),(12,3,2,'cjjj','Login','Signed in','2026-10-24 04:09:02'),(13,3,2,'cjjj','Transaction created','Record #2: item','2026-10-24 04:12:18'),(14,4,NULL,'Super Administrator','Login','Signed in','2026-10-24 04:35:02'),(15,2,1,'System Administrator','Login','Signed in','2026-10-24 04:35:02'),(16,4,NULL,'Super Administrator','Login','Signed in','2026-10-24 05:37:40'),(17,3,2,'cjjj','Login','Signed in','2026-10-24 06:21:42'),(18,3,2,'cjjj','Login','Signed in','2026-10-24 06:22:19'),(19,3,2,'cjjj','Login','Signed in','2026-10-24 06:25:09'),(20,3,2,'cjjj','Login','Signed in','2026-10-24 06:42:31'),(21,5,NULL,'Super Administrator','Login','Signed in','2026-10-24 06:51:36');
 /*!40000 ALTER TABLE `activity_logs` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -245,7 +245,7 @@ CREATE TABLE `users` (
   KEY `approved_by` (`approved_by`),
   CONSTRAINT `users_ibfk_1` FOREIGN KEY (`workspace_id`) REFERENCES `workspaces` (`id`),
   CONSTRAINT `users_ibfk_2` FOREIGN KEY (`approved_by`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -254,7 +254,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'Contessa Vidad','contessa','$2y$10$ZLKGUkPqlVkzt/.nBV732OdMQELgDjfQjDoqTwijG4DbervX74BQW','Business Owner',1,1,1,'Approved',NULL,NULL,'2026-10-24 02:52:27'),(2,'System Administrator','admin','$2y$10$yQpxBSJZ6LbGEuEA56zKQelWd44QgiUy66B9tUn0XMZI4EuazkHpq','Business Owner',1,1,1,'Approved',NULL,NULL,'2026-10-24 03:25:03'),(3,'cjjj','cjjj','$2y$10$ORf0YSvLAwezaOoFaQpNtu4NZCPiTDz06OaIOXJd9Bu/IpkHVWFvK','Business Owner',1,1,2,'Approved',NULL,NULL,'2026-10-24 03:30:30'),(4,'Super Administrator','superadmin','$2y$10$VhnvCGpKc.uW8kOpdDj1HOwOMmJI/Hnw4FUFGqH.pXNe4PIw2id66','Super Admin',1,1,NULL,'Approved',NULL,NULL,'2026-10-24 03:38:12');
+INSERT INTO `users` VALUES (1,'Contessa Vidad','contessa','$2y$10$ZLKGUkPqlVkzt/.nBV732OdMQELgDjfQjDoqTwijG4DbervX74BQW','Business Owner',1,1,1,'Approved',NULL,NULL,'2026-10-24 02:52:27'),(2,'System Administrator','admin','$2y$10$yQpxBSJZ6LbGEuEA56zKQelWd44QgiUy66B9tUn0XMZI4EuazkHpq','Business Owner',1,1,1,'Approved',NULL,NULL,'2026-10-24 03:25:03'),(3,'cjjj','cjjj','$2y$10$ORf0YSvLAwezaOoFaQpNtu4NZCPiTDz06OaIOXJd9Bu/IpkHVWFvK','Super Admin',1,1,2,'Approved',NULL,NULL,'2026-10-24 03:30:30'),(4,'Super Administrator','superadmin','$2y$10$VhnvCGpKc.uW8kOpdDj1HOwOMmJI/Hnw4FUFGqH.pXNe4PIw2id66','Super Admin',1,1,NULL,'Approved',NULL,NULL,'2026-10-24 03:38:12'),(5,'Super Administrator','spadmin','$2y$10$t.wz7ZpWvWJAeZCe.ndcXefFeewg8UXjDkYVLmf/m3KtwdDZzxCsW','Super Admin',1,1,NULL,'Approved',NULL,NULL,'2026-10-24 06:51:36');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -301,4 +301,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-10-24 13:36:27
+-- Dump completed on 2026-10-24 14:52:01

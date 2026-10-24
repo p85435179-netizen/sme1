@@ -12,7 +12,7 @@ async function refreshWorkspace() {
   try {
     const info = await sessionReady;
     if (!info.user) {
-      location.replace(new URL('../login.html', apiBase).href);
+      location.replace(new URL('../login.php', apiBase).href);
       return;
     }
     if (document.body.dataset.role !== info.user.role) {
@@ -33,7 +33,7 @@ async function refreshWorkspace() {
   } catch (error) {
     $('#main').setAttribute('aria-busy', 'false');
     $('#main').innerHTML =
-      `<section class="card panel"><h1>Unable to load workspace</h1><p>${esc(error.message)}</p><button onclick="location.reload()">Try again</button><a href="${new URL('../login.html', apiBase).href}">Sign in</a></section>`;
+      `<section class="card panel"><h1>Unable to load workspace</h1><p>${esc(error.message)}</p><button onclick="location.reload()">Try again</button><a href="${new URL('../login.php', apiBase).href}">Sign in</a></section>`;
   }
 })();
 
