@@ -1,0 +1,104 @@
+CREATE DATABASE IF NOT EXISTS sme CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE sme;
+
+CREATE TABLE IF NOT EXISTS workspaces (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(400) NOT NULL,
+    opening_balance DECIMAL(11,2) NOT NULL DEFAULT 0,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS users (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(400) NOT NULL,
+    username VARCHAR(160) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    role VARCHAR(160) NOT NULL,
+    active INTEGER NOT NULL DEFAULT 0,
+    session_version INTEGER NOT NULL DEFAULT 1,
+    workspace_id BIGINT UNSIGNED,
+    approval_status VARCHAR(160) NOT NULL DEFAULT 'Pending',
+    approved_by BIGINT UNSIGNED,
+    approved_at DATETIME,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (workspace_id) REFERENCES workspaces(id),
+    FOREIGN KEY (approved_by) REFERENCES users(id)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS transactions (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    date DATE NOT NULL,
+    name VARCHAR(400) NOT NULL,
+    category VARCHAR(160) NOT NULL,
+    source VARCHAR(160) NOT NULL DEFAULT '',
+    type VARCHAR(160) NOT NULL,
+    amount DECIMAL(11,2) NOT NULL,
+    status VARCHAR(160) NOT NULL DEFAULT 'Pending',
+    user_id BIGINT UNSIGNED NOT NULL,
+    workspace_id BIGINT UNSIGNED,
+    version INTEGER NOT NULL DEFAULT 1,
+    reviewed_by BIGINT UNSIGNED,
+    reviewed_at DATETIME,
+    review_note VARCHAR(1000) NOT NULL DEFAULT '',
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (workspace_id) REFERENCES workspaces(id),
+    FOREIGN KEY (reviewed_by) REFERENCES users(id)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS settings (
+    `key` VARCHAR(160) PRIMARY KEY,
+    `value` VARCHAR(1000) NOT NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS attempts (
+    ip VARCHAR(160) PRIMARY KEY,
+    count INTEGER NOT NULL,
+    started BIGINT NOT NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS activity_logs (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT UNSIGNED,
+    workspace_id BIGINT UNSIGNED,
+    actor_name VARCHAR(160) NOT NULL,
+    action VARCHAR(160) NOT NULL,
+    details VARCHAR(1000) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (workspace_id) REFERENCES workspaces(id)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS billing_invoices (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    workspace_id BIGINT UNSIGNED NOT NULL,
+    created_by BIGINT UNSIGNED NOT NULL,
+    invoice_number VARCHAR(100) NOT NULL,
+    customer VARCHAR(160) NOT NULL,
+    date DATE NOT NULL,
+    due_date DATE NOT NULL,
+    amount DECIMAL(11,2) NOT NULL,
+    paid_amount DECIMAL(11,2) NOT NULL DEFAULT 0,
+    status VARCHAR(160) NOT NULL DEFAULT 'Unpaid',
+    notes VARCHAR(1000) NOT NULL DEFAULT '',
+    version INTEGER NOT NULL DEFAULT 1,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(workspace_id,invoice_number),
+    FOREIGN KEY (workspace_id) REFERENCES workspaces(id),
+    FOREIGN KEY (created_by) REFERENCES users(id)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS invoice_payments (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    invoice_id BIGINT UNSIGNED NOT NULL,
+    transaction_id BIGINT UNSIGNED NOT NULL UNIQUE,
+    amount DECIMAL(11,2) NOT NULL,
+    date DATE NOT NULL,
+    user_id BIGINT UNSIGNED NOT NULL,
+    FOREIGN KEY (invoice_id) REFERENCES billing_invoices(id),
+    FOREIGN KEY (transaction_id) REFERENCES transactions(id),
+    FOREIGN KEY (user_id) REFERENCES users(id)
+) ENGINE=InnoDB;
+
+
