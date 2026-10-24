@@ -11,12 +11,6 @@ if (!in_array($action, ['register', 'setup', 'login'], true)) {
 if ($method !== 'POST') {
     respondError('Method not allowed.', 405);
 }
-$ip = $_SERVER['REMOTE_ADDR'] ?? 'local';
-$now = time();
-$attempt = queryDatabase('SELECT * FROM attempts WHERE ip=?', [$ip])->fetch();
-if ($attempt && $attempt['started'] > $now - 900 && $attempt['count'] >= 10) {
-    respondError('Too many attempts. Try again in 15 minutes.', 429);
-}
 if ($action === 'login') {
     $username = validateUsername($input['username'] ?? null);
     $account = queryDatabase('SELECT * FROM users WHERE username=?', [$username])->fetch();
@@ -25,11 +19,6 @@ if ($action === 'login') {
         !is_string($input['password'] ?? null) ||
         !password_verify($input['password'], $account['password'])
     ) {
-        $query =
-            $driver === 'mysql'
-                ? 'INSERT INTO attempts (ip,count,started) VALUES (?,1,?) ON DUPLICATE KEY UPDATE count=IF(started<?,1,count+1),started=IF(started<?,?,started)'
-                : 'INSERT INTO attempts (ip,count,started) VALUES (?,1,?) ON CONFLICT(ip) DO UPDATE SET count=CASE WHEN started<? THEN 1 ELSE count+1 END,started=CASE WHEN started<? THEN ? ELSE started END';
-        queryDatabase($query, [$ip, $now, $now - 900, $now - 900, $now]);
         respondError('Username or password is incorrect.', 401);
     }
     if (!$account['active'] || $account['approval_status'] !== 'Approved') {
@@ -41,7 +30,6 @@ if ($action === 'login') {
         );
     }
     validateChoice($account['role'], ['Super Admin', 'Business Owner', 'Finance Staff', 'Manager']);
-    queryDatabase('DELETE FROM attempts WHERE ip=?', [$ip]);
     session_regenerate_id(true);
     $_SESSION['uid'] = (int) $account['id'];
     $_SESSION['auth_version'] = (int) $account['session_version'];
