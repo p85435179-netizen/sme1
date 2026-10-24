@@ -97,12 +97,17 @@ function download(name, rows) {
 
 function showHelp() {
   if (role === 'Super Admin') {
-    openModal('Super Admin guide', '<p>Open Registrations to review business owner applications. Approve an application to enable sign-in, or reject it to deny access.</p>', async () => closeModal(), 'Done');
+    openModal(
+      'Super Admin guide',
+      '<p>Open Registrations to review business owner applications. Approve an application to enable sign-in, or reject it to deny access.</p>',
+      async () => closeModal(),
+      'Done',
+    );
     return;
   }
   openModal(
     'Workspace guide',
-    '<p>Business Owners are administrators for their own business. They manage users, approve team registrations, set opening cash, and can permanently delete records.</p><p>Finance Staff record income and expenses, edit transactions, and manage invoices and payments. They cannot manage users or permanently delete records.</p><p>Managers can view dashboards, transaction history, financial summaries and reports. They cannot change financial records or business settings.</p><p>Cash balance is opening cash plus recorded receipts minus recorded spending. Unpaid invoices do not count as receipts. This is basic financial tracking, not a tax-filing or full accounting system.</p>',
+    '<p>Business Owners are administrators for their own business. They manage Finance Staff and Managers, set opening cash, and can permanently delete records.</p><p>Finance Staff record income and expenses, edit transactions, and manage invoices and payments. They cannot manage users or permanently delete records.</p><p>Managers can view dashboards, transaction history, financial summaries and reports. They cannot change financial records or business settings.</p><p>Record every sale as income and each business cost as an expense. The system totals income and expenses, then subtracts expenses from income to show profit. Use the charts to see trends, and print reports or download them as CSV.</p><p>Cash balance is opening cash plus recorded receipts minus recorded spending. Unpaid invoices do not count as receipts. This is basic financial tracking, not a tax-filing or full accounting system.</p>',
     async () => closeModal(),
     'Done',
   );
@@ -110,7 +115,14 @@ function showHelp() {
 
 function showNotifications() {
   if (role === 'Super Admin') {
-    openModal('Registration updates', '<p>' + users.filter((account) => account.approval_status === 'Pending').length + ' business owner registration(s) awaiting review.</p>', async () => closeModal(), 'Done');
+    openModal(
+      'Registration updates',
+      '<p>' +
+        users.filter((account) => account.approval_status === 'Pending').length +
+        ' business owner registration(s) awaiting review.</p>',
+      async () => closeModal(),
+      'Done',
+    );
     return;
   }
   if (role === 'Manager') {

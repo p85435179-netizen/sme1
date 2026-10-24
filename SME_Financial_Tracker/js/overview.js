@@ -44,18 +44,29 @@ function profitTrend() {
   return `<section class="card panel"><h2>Profit trend</h2><p>Monthly income minus expenses</p><svg class="profit-chart" viewBox="0 0 560 205" role="img" aria-label="Six-month profit trend"><line x1="25" x2="540" y1="${y(0)}" y2="${y(0)}" stroke="#d8e2df" stroke-dasharray="4 4"/><polyline points="${points}" fill="none" stroke="#29977b" stroke-width="3"/>${months.map((month, index) => `<circle cx="${30 + index * 100}" cy="${y(month.profit)}" r="4" fill="#29977b"><title>${month.label}: ${money(month.profit)}</title></circle><text x="${30 + index * 100}" y="194" text-anchor="middle" font-size="10" fill="#667a7e">${month.label}</text>`).join('')}</svg><div class="trend-values">${months.map((month) => `<div><small>${month.label}</small><strong>${money(month.profit)}</strong></div>`).join('')}</div></section>`;
 }
 
+function expenseGroups() {
+  const grouped = { Rent: 0, Salary: 0, Utilities: 0, Supplies: 0, Others: 0 };
+  transactions
+    .filter(
+      (record) =>
+        record.status === 'Approved' &&
+        record.type === 'Expense' &&
+        record.date.startsWith(dashboardMonth),
+    )
+    .forEach((record) => {
+      let category = record.category;
+      if (category === 'Payroll') category = 'Salary';
+      if (['Electricity', 'Internet'].includes(category)) category = 'Utilities';
+      if (!Object.hasOwn(grouped, category)) category = 'Others';
+      grouped[category] += Number(record.amount);
+    });
+  return grouped;
+}
 function expenseCategories() {
-  const expense = transactions.filter(
-    (record) =>
-      record.status === 'Approved' &&
-      record.type === 'Expense' &&
-      record.date.startsWith(dashboardMonth),
-  );
-  const grouped = {};
-  expense.forEach((record) => {
-    grouped[record.category] = (grouped[record.category] || 0) + record.amount;
-  });
-  const entries = Object.entries(grouped).sort((a, b) => b[1] - a[1]);
+  const grouped = expenseGroups();
+  const entries = Object.entries(grouped)
+    .filter(([, amount]) => amount > 0)
+    .sort((a, b) => b[1] - a[1]);
   const sum = entries.reduce((total, [, value]) => total + value, 0);
   const colors = ['#29977b', '#6b96c3', '#aa8ac5', '#d5a45e', '#6aa7a1', '#cc817c', '#8c97a3'];
   let offset = 0;
@@ -70,7 +81,11 @@ function expenseCategories() {
 }
 
 function overview() {
-  const summary = totals(transactions.filter((record) => record.date.startsWith(dashboardMonth)));
+  const monthRecords = transactions.filter(
+    (record) => record.status === 'Approved' && record.date.startsWith(dashboardMonth),
+  );
+  const summary = totals(monthRecords);
+  const highest = Object.entries(expenseGroups()).sort((a, b) => b[1] - a[1])[0];
   return (
     heading(
       'Business dashboard',
@@ -80,8 +95,8 @@ function overview() {
         : '',
     ) +
     `<div class="dashboard-period"><label for="dashboard-month">Financial month</label><input id="dashboard-month" type="month" value="${dashboardMonth}" onchange="if(this.value){dashboardMonth=this.value;render()}"></div>` +
-    `<div class="stats">${stat('Total Income', money(summary.income), 'Recorded this month', '↗')}${stat('Total Expenses', money(summary.expense), 'Recorded this month', '↘')}${stat('Net Profit', money(summary.income - summary.expense), 'Monthly income − expenses', '₱')}${stat('Cash Balance', money(cashBalance()), 'Opening cash + receipts − spending', '▣')}</div>` +
+    `<div class="stats dashboard-stats">${stat('Total Income', money(summary.income), 'Recorded this month', '↗')}${stat('Total Expenses', money(summary.expense), 'Recorded this month', '↘')}${stat('Net Profit', money(summary.income - summary.expense), 'Monthly income − expenses', '₱')}${stat('Cash Balance', money(cashBalance()), 'Opening cash + receipts − spending', '▣')}${stat('Number of Transactions', monthRecords.length, 'Recorded this month', '⇄')}${stat('Highest Expense Category', highest[1] > 0 ? highest[0] : 'None', highest[1] > 0 ? money(highest[1]) + ' this month' : 'No expenses this month', '◔')}</div>` +
     `<div class="finance-chart-grid">${monthlyChart()}${profitTrend()}</div>${expenseCategories()}` +
-    `<section class="card panel tablepanel"><div class="panelhead"><h2>Recent transactions</h2><button onclick="go('Transactions')">View history →</button></div>${recordRows(transactions.slice(0, 5))}</section>`
+    `<section class="card panel tablepanel"><div class="panelhead"><h2>Recent transactions</h2><button onclick="go('Transactions')">View history →</button></div>${recordRows([...transactions].sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id).slice(0, 5))}</section>`
   );
 }

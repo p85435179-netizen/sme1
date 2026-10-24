@@ -37,9 +37,7 @@ function editUser(id) {
           ['Finance Staff', 'Finance Staff'],
           ['Manager', 'Manager'],
         ],
-        ['Finance Staff', 'Manager'].includes(account?.role)
-          ? account.role
-          : 'Finance Staff',
+        ['Finance Staff', 'Manager'].includes(account?.role) ? account.role : 'Finance Staff',
       ) +
       (account
         ? '<p class="section-note">Editing a pending user does not approve them. Use Approve / Enable after saving.</p>'
@@ -82,9 +80,14 @@ function deleteUser(id) {
 function registrationsPage() {
   const pending = users.filter((account) => account.approval_status === 'Pending');
   const records = filteredUsers();
-  return heading('Business registrations', 'Review business owner applications before allowing sign-in.') +
+  return (
+    heading(
+      'Business registrations',
+      'Review business owner applications before allowing sign-in.',
+    ) +
     `<div class="stats">${stat('Pending registrations', pending.length, 'Awaiting your review')}${stat('Approved owners', users.filter((account) => account.approval_status === 'Approved').length, 'Accounts with business access')}</div>` +
-    `<section class="card panel"><div class="filters"><input aria-label="Search registrations" placeholder="Search owner or username" value="${esc(userQuery)}" oninput="userQuery=this.value;updateRegistrations()"><select aria-label="Registration status" onchange="userStatus=this.value;updateRegistrations()">${['All','Pending','Approved','Rejected'].map((value) => `<option ${userStatus === value ? 'selected' : ''}>${value}</option>`).join('')}</select></div><div id="registration-results">${registrationRows(records)}</div></section>`;
+    `<section class="card panel"><div class="filters"><input aria-label="Search registrations" placeholder="Search owner or username" value="${esc(userQuery)}" oninput="userQuery=this.value;updateRegistrations()"><select aria-label="Registration status" onchange="userStatus=this.value;updateRegistrations()">${['All', 'Pending', 'Approved', 'Rejected'].map((value) => `<option ${userStatus === value ? 'selected' : ''}>${value}</option>`).join('')}</select></div><div id="registration-results">${registrationRows(records)}</div></section>`
+  );
 }
 function registrationRows(records) {
   return `<div class="tablewrap"><table><thead><tr><th>OWNER</th><th>BUSINESS</th><th>SUBMITTED</th><th>STATUS</th><th>ACTIONS</th></tr></thead><tbody>${records.map((account) => `<tr><td><strong>${esc(account.name)}</strong><small>${esc(account.username)}</small></td><td>${esc(account.business)}</td><td>${esc(formatTimestamp(account.created_at))}</td><td><span class="pill ${account.approval_status === 'Pending' ? 'pending' : account.approval_status === 'Approved' ? '' : 'rejected'}">${esc(account.approval_status)}</span></td><td class="row-actions">${account.approval_status === 'Pending' ? `<button onclick="reviewRegistration(${Number(account.id)},'Approved')">Approve</button><button class="danger-text" onclick="reviewRegistration(${Number(account.id)},'Rejected')">Reject</button>` : 'Reviewed'}</td></tr>`).join('')}</tbody></table></div>${records.length ? '' : '<div class="empty">No registrations found.</div>'}`;
@@ -94,18 +97,31 @@ function updateRegistrations() {
 }
 function reviewRegistration(id, status) {
   const account = users.find((entry) => Number(entry.id) === id);
-  openModal(status === 'Approved' ? 'Approve registration?' : 'Reject registration?',
+  openModal(
+    status === 'Approved' ? 'Approve registration?' : 'Reject registration?',
     `<p>${esc(account.name)} · ${esc(account.business)}</p><p>${status === 'Approved' ? 'Allow this owner to sign in and manage their business?' : 'Reject this application? This owner will not be able to sign in.'}</p>`,
-    async () => saveAndRefresh('registration_review', {id, status}, 'Registration ' + status.toLowerCase()),
-    status === 'Approved' ? 'Approve' : 'Reject');
+    async () =>
+      saveAndRefresh('registration_review', { id, status }, 'Registration ' + status.toLowerCase()),
+    status === 'Approved' ? 'Approve' : 'Reject',
+  );
 }
 function ownerDirectoryPage() {
-  return heading('User Management', 'Create accounts for any role, or select an owner to view their business team.', '<button class="primary" onclick="createAdminUser()">＋ Add user</button>') +
+  return (
+    heading(
+      'User Management',
+      'Create accounts for any role, or select an owner to view their business team.',
+      '<button class="primary" onclick="createAdminUser()">＋ Add user</button>',
+    ) +
     `<section class="card panel"><div class="filters"><input aria-label="Search business owners" placeholder="Search owner, username or business" value="${esc(userQuery)}" oninput="userQuery=this.value;updateOwnerDirectory()"></div><div id="owner-directory">${ownerDirectoryRows()}</div></section>` +
-    `<section class="card panel"><h2>Super Admins</h2><div class="tablewrap"><table><thead><tr><th>NAME</th><th>USERNAME</th><th>STATUS</th></tr></thead><tbody>${systemAdmins.map((account) => `<tr><td>${esc(account.name)}</td><td>${esc(account.username)}</td><td>${esc(account.approval_status)}</td></tr>`).join('')}</tbody></table></div></section>`;
+    `<section class="card panel"><h2>Super Admins</h2><div class="tablewrap"><table><thead><tr><th>NAME</th><th>USERNAME</th><th>STATUS</th></tr></thead><tbody>${systemAdmins.map((account) => `<tr><td>${esc(account.name)}</td><td>${esc(account.username)}</td><td>${esc(account.approval_status)}</td></tr>`).join('')}</tbody></table></div></section>`
+  );
 }
 function ownerDirectoryRows() {
-  const records = users.filter((account) => `${account.name} ${account.username} ${account.business}`.toLowerCase().includes(userQuery.toLowerCase()));
+  const records = users.filter((account) =>
+    `${account.name} ${account.username} ${account.business}`
+      .toLowerCase()
+      .includes(userQuery.toLowerCase()),
+  );
   return `<div class="tablewrap"><table><thead><tr><th>BUSINESS OWNER</th><th>BUSINESS</th><th>STATUS</th><th>TEAM</th></tr></thead><tbody>${records.map((account) => `<tr><td><button class="owner-name-button" onclick="viewBusinessTeam(${Number(account.id)})">${esc(account.name)}</button><small>${esc(account.username)}</small></td><td>${esc(account.business)}</td><td><span class="pill ${account.approval_status === 'Pending' ? 'pending' : account.approval_status === 'Approved' ? '' : 'rejected'}">${esc(account.approval_status)}</span></td><td><button onclick="viewBusinessTeam(${Number(account.id)})">View staff &amp; managers</button></td></tr>`).join('')}</tbody></table></div>${records.length ? '' : '<div class="empty">No business owners found.</div>'}`;
 }
 function updateOwnerDirectory() {
@@ -123,16 +139,33 @@ function businessTeamDetails({ owner, team }) {
   return `<p><strong>${esc(owner.business)}</strong></p><p>Owner: ${esc(owner.name)} · ${esc(owner.username)}</p><p>${team.filter((account) => account.role === 'Finance Staff').length} Finance Staff · ${team.filter((account) => account.role === 'Manager').length} Managers</p><div class="tablewrap"><table><thead><tr><th>NAME</th><th>ROLE</th><th>STATUS</th></tr></thead><tbody>${team.map((account) => `<tr><td><strong>${esc(account.name)}</strong><small>${esc(account.username)}</small></td><td>${esc(account.role)}</td><td>${esc(account.approval_status)}</td></tr>`).join('')}</tbody></table></div>${team.length ? '' : '<div class="empty">This business has no Finance Staff or Managers yet.</div>'}`;
 }
 function createAdminUser() {
-  const businesses = [...new Map(users.filter((account) => account.approval_status === 'Approved' && Number(account.active) === 1).map((account) => [Number(account.workspace_id), account.business])).entries()];
-  openModal('Create user',
-    input('Full name', 'name') + input('Username', 'username') +
-    selectField('Role', 'role', ['Business Owner', 'Finance Staff', 'Manager', 'Super Admin'].map((value) => [value, value]), 'Business Owner') +
-    `<div id="new-owner-business">${input('Business name', 'workspace')}</div>` +
-    `<div id="new-team-business" hidden>${selectField('Business', 'workspace_id', [['', 'Select a business'], ...businesses], '')}<p class="section-note">Select the business this staff member or manager belongs to.</p></div>` +
-    input('Initial password', 'password', 'password') +
-    '<p class="section-note">Accounts created by Super Admin are approved immediately.</p>',
+  const businesses = [
+    ...new Map(
+      users
+        .filter((account) => account.approval_status === 'Approved' && Number(account.active) === 1)
+        .map((account) => [Number(account.workspace_id), account.business]),
+    ).entries(),
+  ];
+  openModal(
+    'Create user',
+    input('Full name', 'name') +
+      input('Username', 'username') +
+      selectField(
+        'Role',
+        'role',
+        ['Business Owner', 'Finance Staff', 'Manager', 'Super Admin'].map((value) => [
+          value,
+          value,
+        ]),
+        'Business Owner',
+      ) +
+      `<div id="new-owner-business">${input('Business name', 'workspace')}</div>` +
+      `<div id="new-team-business" hidden>${selectField('Business', 'workspace_id', [['', 'Select a business'], ...businesses], '')}<p class="section-note">Select the business this staff member or manager belongs to.</p></div>` +
+      input('Initial password', 'password', 'password') +
+      '<p class="section-note">Accounts created by Super Admin are approved immediately.</p>',
     async (data) => saveAndRefresh('admin_user_create', Object.fromEntries(data), 'User created'),
-    'Create user');
+    'Create user',
+  );
   $('#field-role').addEventListener('change', updateAdminUserRole);
   updateAdminUserRole();
 }

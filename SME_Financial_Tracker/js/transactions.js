@@ -18,8 +18,8 @@ function filteredTransactions() {
     });
 }
 
-function recordRows(records) {
-  const writable = role !== 'Manager';
+function recordRows(records, showActions = true) {
+  const writable = showActions && role !== 'Manager';
   return `<div class="tablewrap"><table><thead><tr><th>TRANSACTION</th><th>DATE</th><th>CATEGORY / SOURCE</th><th>AMOUNT</th><th>STATUS</th>${writable ? '<th>ACTIONS</th>' : ''}</tr></thead><tbody>${records.map((record) => `<tr><td><strong>${esc(record.name)}</strong><small>TX-${String(record.id).padStart(5, '0')} · ${esc(record.type)} · ${esc(record.created_by)}</small></td><td>${esc(record.date)}</td><td>${esc(record.category)}${record.source ? `<small>${esc(record.source)}</small>` : ''}</td><td class="money ${record.type.toLowerCase()}">${record.type === 'Income' ? '+' : '−'}${money(record.amount)}</td><td><span class="pill ${record.status === 'Pending' ? 'pending' : record.status === 'Rejected' ? 'rejected' : ''}">${record.status === 'Approved' ? 'Recorded' : esc(record.status)}</span></td>${writable ? `<td class="row-actions">${record.invoice_id ? '<span class="pill">Invoice receipt</span>' : `<button onclick="editTransaction(${record.id})">Edit</button>${role === 'Business Owner' ? `${record.status !== 'Approved' ? `<button onclick="postLegacyRecord(${record.id})">Post</button>` : ''}<button class="danger-text" onclick="deleteTransaction(${record.id})">Delete</button>` : ''}`}</td>` : ''}</tr>`).join('')}</tbody></table></div>${records.length ? '' : '<div class="empty">No transactions found.</div>'}`;
 }
 

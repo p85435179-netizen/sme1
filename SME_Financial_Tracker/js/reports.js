@@ -21,7 +21,7 @@ function setReportPeriod(value, draw = true) {
   } else if (value === 'Monthly') {
     start.setDate(1);
     end.setMonth(current.getMonth() + 1, 0);
-  } else if (value === 'Annual') {
+  } else if (value === 'Yearly') {
     start.setMonth(0, 1);
     end.setMonth(11, 31);
   } else {
@@ -55,9 +55,9 @@ function reportsPage() {
     heading(
       headingText,
       'Recorded income − recorded expenses = net profit. Unpaid invoices are excluded.',
-      '<button onclick="exportReport()">⇩ Export report</button>',
+      '<button onclick="window.print()">Print / Save PDF</button><button onclick="exportReport()">⇩ Download CSV</button>',
     ) +
-    `<section class="card panel filters"><label>Report period<select aria-label="Report period" onchange="setReportPeriod(this.value)">${['Daily', 'Weekly', 'Monthly', 'Annual', 'All dates', 'Custom'].map((value) => `<option ${reportPeriod === value ? 'selected' : ''}>${value}</option>`).join('')}</select></label><label>From<input id="report-from" type="date" value="${reportFrom}"></label><label>To<input id="report-to" type="date" value="${reportTo}"></label><button onclick="applyReportDates()">Apply dates</button></section><div class="stats">${stat('Total Income', money(summary.income), 'Selected reporting period', '↗')}${stat('Total Expenses', money(summary.expense), 'Selected reporting period', '↘')}${stat('Net Profit', money(summary.income - summary.expense), 'Income − expenses', '₱')}${stat('Cash Balance', money(cashBalance()), 'Available now · all recorded dates', '▣')}</div><section class="card panel"><h2>Category summary</h2><p>${records.length} recorded transaction(s) in this report.</p><div class="tablewrap"><table><thead><tr><th>CATEGORY</th><th>INCOME</th><th>EXPENSES</th><th>NET</th></tr></thead><tbody>${[
+    `<p class="report-period-label">${esc(currentUser.business)} · ${esc(reportPeriod)} report · ${esc(reportFrom || 'All dates')} to ${esc(reportTo || 'Present')}</p><section class="card panel filters report-filters"><label>Report period<select aria-label="Report period" onchange="setReportPeriod(this.value)">${['Daily', 'Weekly', 'Monthly', 'Yearly', 'All dates', 'Custom'].map((value) => `<option ${reportPeriod === value ? 'selected' : ''}>${value}</option>`).join('')}</select></label><label>From<input id="report-from" type="date" value="${reportFrom}"></label><label>To<input id="report-to" type="date" value="${reportTo}"></label><button onclick="applyReportDates()">Apply dates</button></section><div class="stats">${stat('Total Income', money(summary.income), 'Selected reporting period', '↗')}${stat('Total Expenses', money(summary.expense), 'Selected reporting period', '↘')}${stat('Net Profit', money(summary.income - summary.expense), 'Income − expenses', '₱')}${stat('Cash Balance', money(cashBalance()), 'Available now · all recorded dates', '▣')}</div><section class="card panel"><h2>Category summary</h2><p>${records.length} recorded transaction(s) in this report.</p><div class="tablewrap"><table><thead><tr><th>CATEGORY</th><th>INCOME</th><th>EXPENSES</th><th>NET</th></tr></thead><tbody>${[
       ...new Set(records.map((record) => record.category)),
     ]
       .sort()
@@ -67,7 +67,7 @@ function reportsPage() {
       })
       .join(
         '',
-      )}</tbody></table></div>${records.length ? '' : '<div class="empty">No recorded transactions in this period.</div>'}</section><section class="card panel tablepanel"><h2>Report transactions</h2>${recordRows(records)}</section>`
+      )}</tbody></table></div>${records.length ? '' : '<div class="empty">No recorded transactions in this period.</div>'}</section><section class="card panel tablepanel"><h2>Transaction Summary</h2>${recordRows(records, false)}</section>`
   );
 }
 function financialSummaryPage() {
@@ -82,6 +82,7 @@ function exportReport() {
     ['Total income', summary.income],
     ['Total expenses', summary.expense],
     ['Net profit', summary.income - summary.expense],
+    ['Number of transactions', records.length],
     ['Opening cash balance', Number(currentUser.opening_balance || 0)],
     ['Current cash balance', cashBalance()],
     [],

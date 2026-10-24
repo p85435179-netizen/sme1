@@ -1,12 +1,82 @@
 const apiBase = new URL('../api/index.php', document.currentScript.src).href;
 let sessionInfo;
 
-function workspaceHomeUrl() {
-  return new URL('../workspace.php', apiBase).href;
+const roleDirectories = {
+  'Super Admin': 'superadmin',
+  'Business Owner': 'business_owner',
+  'Finance Staff': 'finance_staff',
+  Manager: 'manager',
+};
+const moduleFiles = {
+  Overview: 'dashboard',
+  Income: 'income',
+  Expenses: 'expenses',
+  Transactions: 'transactions',
+  Invoices: 'invoices',
+  Reports: 'reports',
+  'Financial Summary': 'financial_summary',
+  Users: 'user_management',
+  Activity: 'activity',
+  Settings: 'settings',
+  'My account': 'my_account',
+  Registrations: 'registrations',
+};
+const roleModules = {
+  'Super Admin': ['Registrations', 'Users', 'My account'],
+  'Business Owner': [
+    'Overview',
+    'Income',
+    'Expenses',
+    'Transactions',
+    'Invoices',
+    'Reports',
+    'Financial Summary',
+    'Users',
+    'Activity',
+    'Settings',
+  ],
+  'Finance Staff': [
+    'Overview',
+    'Income',
+    'Expenses',
+    'Transactions',
+    'Invoices',
+    'Reports',
+    'Financial Summary',
+    'Activity',
+    'My account',
+  ],
+  Manager: [
+    'Overview',
+    'Income',
+    'Expenses',
+    'Transactions',
+    'Reports',
+    'Financial Summary',
+    'My account',
+  ],
+};
+function moduleUrl(userRole, module) {
+  const directory = roleDirectories[userRole];
+  if (!directory) return new URL('../login.html', apiBase).href;
+  if (!roleModules[userRole].includes(module)) module = roleModules[userRole][0];
+  return new URL('../' + directory + '/' + moduleFiles[module] + '.html', apiBase).href;
 }
-
-function openWorkspace() {
-  location.replace(workspaceHomeUrl());
+function workspaceHomeUrl(account = sessionInfo?.user) {
+  if (!account) return new URL('../login.html', apiBase).href;
+  return moduleUrl(account.role, account.role === 'Super Admin' ? 'Registrations' : 'Overview');
+}
+async function openWorkspace() {
+  try {
+    sessionInfo = await api('session');
+    location.replace(workspaceHomeUrl());
+  } catch (error) {
+    const output = document.querySelector('[role=alert]');
+    if (output) {
+      output.textContent = error.message;
+      output.hidden = false;
+    }
+  }
 }
 
 async function api(action, data, query = {}) {
@@ -54,10 +124,15 @@ const sessionReady = api('session').then((info) => {
 sessionReady.catch(() => {});
 
 function logout() {
-  openModal('Log out?', '<p>Are you sure you want to log out?</p>', async () => {
-    await api('logout', {});
-    location.replace(new URL('../login.html', apiBase).href);
-  }, 'Log out');
+  openModal(
+    'Log out?',
+    '<p>Are you sure you want to log out?</p>',
+    async () => {
+      await api('logout', {});
+      location.replace(new URL('../login.html', apiBase).href);
+    },
+    'Log out',
+  );
 }
 
 window.addEventListener('pageshow', async (event) => {
@@ -67,6 +142,10 @@ window.addEventListener('pageshow', async (event) => {
     if (document.body?.dataset.protected) {
       if (!sessionInfo.user) {
         location.replace(new URL('../login.html', apiBase).href);
+        return;
+      }
+      if (document.body.dataset.role !== sessionInfo.user.role) {
+        location.replace(workspaceHomeUrl(sessionInfo.user));
         return;
       }
       await loadState();

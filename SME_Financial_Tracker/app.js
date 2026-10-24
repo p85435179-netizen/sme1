@@ -12,15 +12,20 @@ async function refreshWorkspace() {
   try {
     const info = await sessionReady;
     if (!info.user) {
-      location.replace('login.html');
+      location.replace(new URL('../login.html', apiBase).href);
       return;
     }
-    try {
-      page = decodeURIComponent(location.hash.slice(1)) || 'Overview';
-    } catch {
-      page = 'Overview';
+    if (document.body.dataset.role !== info.user.role) {
+      location.replace(workspaceHomeUrl(info.user));
+      return;
     }
+    page = document.body.dataset.page;
     await loadState();
+    if (!menus().includes(page)) {
+      location.replace(workspaceHomeUrl(info.user));
+      return;
+    }
+
     render();
     $('#modal').addEventListener('click', (event) => {
       if (event.target === $('#modal')) closeModal();
@@ -28,7 +33,7 @@ async function refreshWorkspace() {
   } catch (error) {
     $('#main').setAttribute('aria-busy', 'false');
     $('#main').innerHTML =
-      `<section class="card panel"><h1>Unable to load workspace</h1><p>${esc(error.message)}</p><button onclick="location.reload()">Try again</button><a href="login.html">Sign in</a></section>`;
+      `<section class="card panel"><h1>Unable to load workspace</h1><p>${esc(error.message)}</p><button onclick="location.reload()">Try again</button><a href="${new URL('../login.html', apiBase).href}">Sign in</a></section>`;
   }
 })();
 
@@ -63,4 +68,3 @@ setInterval(refreshDashboardInBackground, 30000);
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden) refreshDashboardInBackground();
 });
-
